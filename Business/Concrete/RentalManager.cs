@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspect.Autofac.Validation;
 using Core.Utulities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -18,16 +20,11 @@ namespace Business.Concrete
         {
             _rentalDal = rentalDal;
         }
+
+        [ValidationAspect(typeof(RentalValidator))]
         public IResult Add(Rental rental)
         {
-            if (rental.RentDate!=null)
-            {
-                return new ErrorResult(Messages.InvalidAdd);
-            }
-            if (rental.RentalId == rental.RentalId)
-            {
-                return new ErrorResult(Messages.IdInvalid);
-            }
+            
             _rentalDal.Add(rental);
             return new SuccessResult(Messages.Added);
         }
@@ -69,12 +66,10 @@ namespace Business.Concrete
             return new SuccessDataResult<Rental>(_rentalDal.Get(p => p.RentalId == rentalId), Messages.Listed);
         }
 
+        [ValidationAspect(typeof(RentalValidator))]
         public IResult Update(Rental rental)
         {
-            if (rental.RentalId!=rental.RentalId)
-            {
-                return new ErrorResult(Messages.IdInvalid+" " + Messages.InvalidUpdate);
-            }
+            
             return new SuccessResult(Messages.Updated);
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspect.Autofac.Validation;
 using Core.Utulities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -19,26 +21,17 @@ namespace Business.Concrete
             _colorDal = colorDal;
         }
 
+        [ValidationAspect(typeof(ColorValidator))]
         public IResult Add(Color color)
         {
-            if (color.ColorName.Length<1)
-            {
-                return new ErrorResult(Messages.NameInvalid);
-            }
-            if (color.ColorId == color.ColorId)
-            {
-                return new ErrorResult(Messages.IdInvalid);
-            }
+            
             _colorDal.Add(color);
             return new SuccessResult(Messages.Added);
         }
 
         public IResult Delete(Color color)
         {
-            if (color.ColorId!=color.ColorId)
-            {
-                return new ErrorResult(Messages.IdInvalid+" "+Messages.InvalidDelete);
-            }
+            
             _colorDal.Delete(color);
             return new SuccessResult(Messages.Deleted);
         }
@@ -52,16 +45,10 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Color>>(_colorDal.GetAll(), Messages.Listed);
         }
 
+        [ValidationAspect(typeof(ColorValidator))]
         public IResult Update(Color color)
         {
-            if (DateTime.Now.Hour==22)
-            {
-                return new ErrorResult(Messages.MaintananceTime);
-            }
-            if (color.ColorId!=color.ColorId)
-            {
-                return new ErrorResult(Messages.IdInvalid+" "+Messages.InvalidDelete);
-            }
+            
             _colorDal.Update(color);
             return new SuccessResult(Messages.Updated);
         }

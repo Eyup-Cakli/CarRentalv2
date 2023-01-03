@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspect.Autofac.Validation;
 using Core.Utulities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -19,16 +21,10 @@ namespace Business.Concrete
             _customerDal = customerDal;
         }
 
+        [ValidationAspect(typeof(CustomerValidator))]
         public IResult Add(Customer customer)
         {
-            if (customer.CompanyName.Length<1)
-            {
-                return new ErrorResult(Messages.NameInvalid);
-            }
-            if (customer.CustomerId == customer.CustomerId)
-            {
-                return new ErrorResult(Messages.IdInvalid);
-            }
+            
             _customerDal.Add(customer);
             return new SuccessResult(Messages.Added);
         }
@@ -61,12 +57,10 @@ namespace Business.Concrete
             return new SuccessDataResult<Customer>(_customerDal.Get(p=>p.CustomerId==customerId),Messages.Listed);
         }
 
+        [ValidationAspect(typeof(CustomerValidator))]
         public IResult Update(Customer customer)
         {
-            if (customer.CustomerId!=customer.CustomerId)
-            {   
-                return new ErrorResult(Messages.IdInvalid+" " + Messages.InvalidUpdate);
-            }
+            
             _customerDal.Update(customer);
             return new SuccessResult(Messages.Updated);
         }
